@@ -5,6 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "netlify-lambda serve functions",
+    "clean": "rm -rf functions-build && mkdir functions-build",
+    "zip": "cd functions/gpsbabel && npm install && zip -r gpsbabel.zip *",
+    "postzip": "mv functions/gpsbabel/gpsbabel.zip functions-build",
+    "move-other-func": "cp functions/*.js functions-build",
+    "prebuild": "npm run clean && npm run zip && npm run move-other-func",
     "build": "netlify-lambda build functions"
   },
   "dependencies": {
