@@ -41,7 +41,7 @@ const saveFile = async (data, fileName) => {
   return fileType;
 };
 
-const convertFile = async (inType, fileName, inFileType, outType, count, distance) => {
+const convertFile = async (inType, fileName, inFileType, outType, count, distance, error) => {
   if (typeMapping[inType] === undefined || typeMapping[outType] === undefined) {
     return false;
   }
@@ -54,8 +54,11 @@ const convertFile = async (inType, fileName, inFileType, outType, count, distanc
   if (distance !== undefined) {
     params.push(`-x position,distance=${distance}`);
   }
+  if (error !== undefined) {
+    params.push(`-x simplify,crosstrack,error=${error}`);
+  }
   if (count !== undefined) {
-    params.push(`-x simplify,crosstrack,count=${count}`);
+    params.push(`-x simplify,count=${count}`);
   }
   params.push(`-o ${outType}`);
   params.push(`-F ${outFile}`);
@@ -88,9 +91,8 @@ exports.handler = async (event, context) => {
       var inType = event.queryStringParameters.intype;
     }
     const outType = event.queryStringParameters.outtype;
-    const { count } = event.queryStringParameters;
-    const { distance } = event.queryStringParameters;
-    const outFile = await convertFile(inType, fileName, inFileType, outType, count, distance);
+    const { count, distance, error } = event.queryStringParameters;
+    const outFile = await convertFile(inType, fileName, inFileType, outType, count, distance, error);
 
     if (outFile === false) {
       return {

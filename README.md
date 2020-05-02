@@ -22,8 +22,9 @@ Content as Body in an POST Request
 **Query:**
 - `infile` - absolute URL to the input file
 - `outtype` - format to be converted into
-- `disance` - optional - (use the simplify filter if set)
-- `count` - optional - (use the position filter if set)
+- `distance` - optional - (use the position filter if set)
+- `count` - optional - (use the simplify filter with count option if set)
+- `error`- optional - (use the simplify filter with error option if set)
 
 **Method:** POST
 
@@ -33,8 +34,8 @@ Content as Body in an POST Request
 - `body` - File Content
 - `intype` - input format
 - `outtype` - format to be converted into
-- `disance` - optional - (use the simplify filter if set)
-- `count` - optional - (use the position filter if set)
+- `count` - optional - (use the simplify filter with count option if set)
+- `error`- optional - (use the simplify filter with error option if set)
 
 
 ### Deploy with Netlify
