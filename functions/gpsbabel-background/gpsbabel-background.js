@@ -78,22 +78,32 @@ const readFile = async (fileName, inFileType, outType) => {
 };
 
 exports.handler = async (event, context) => {
+  let inFile;
+  let inFileType;
+  let inType;
+  let body = {};
+  const params = event.queryStringParameters;
   if (event.httpMethod === 'GET' || event.httpMethod === 'POST') {
     const fileName = `/tmp/${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
     if (event.httpMethod === 'GET') {
-      const inFile = event.queryStringParameters.infile;
-      const url = new URL(inFile);
-      var inFileType = await saveFile(await (await axios.get(url.href)).data, fileName);
-      const extension = url.pathname.split('.').pop();
-      var inType = event.queryStringParameters.intype || fileTypeMapping[extension];
+      inFile = params.infile;
     } else if (event.httpMethod === 'POST') {
-      var inFileType = await saveFile(event.body, fileName);
-      var inType = event.queryStringParameters.intype;
+      if (await isJson(event.body) === true) {
+        body = JSON.parse(event.body);
+        inFile = body.url;
+      } else {
+        inFileType = await saveFile(event.body, fileName);
+        inType = params.intype;
+      }
     }
-    const outType = event.queryStringParameters.outtype;
-    const { count, distance, error } = event.queryStringParameters;
+    if (inFile) {
+      const url = new URL(inFile);
+      inFileType = await saveFile(await (await axios.get(url.href)).data, fileName);
+      const extension = url.pathname.split('.').pop();
+      inType = params.intype || fileTypeMapping[extension];
+    }
+    const { outtype: outType, count, distance, error, webhook: webHook } = params;
     const outFile = await convertFile(inType, fileName, inFileType, outType, count, distance, error);
-
     if (outFile === false) {
       return {
         statusCode: 405,
@@ -101,12 +111,22 @@ exports.handler = async (event, context) => {
       };
     }
     const data = await readFile(fileName, inFileType, outType);
+    const messageData = {
+      app: 'gpsbabel',
+      event: `convert_${inType}_${outType}`,
+      foreignKey: inFile ? inFile : fileName,
+      data: {
+        event: {
+          body,
+          params,
+        },
+        content: data,
+      },
+    }
+    await axios.post(webHook, JSON.stringify(messageData));
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': typeMapping[outType].mediaType,
-      },
-      body: data,
+      body: 'Ok',
     };
   }
   return {
