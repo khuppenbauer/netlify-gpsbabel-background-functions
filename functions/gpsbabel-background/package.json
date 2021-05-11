@@ -4,7 +4,7 @@
   "author": "Kerstin Huppenbauer",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "child-process-promise": "^2.2.1",
     "fs": "^0.0.1-security",
     "xmldom": "^0.3.0"
