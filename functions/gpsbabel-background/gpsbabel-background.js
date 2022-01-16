@@ -1,5 +1,4 @@
 const axios = require('axios');
-const { DOMParser } = require('xmldom');
 const fs = require('fs').promises;
 const { exec } = require('child-process-promise');
 
@@ -31,10 +30,7 @@ const saveFile = async (data, fileName) => {
     var fileContents = JSON.stringify(JSON.parse(data));
     var fileType = 'json';
   } else {
-    var fileContents = new DOMParser().parseFromString(
-      data,
-      'text/xml',
-    );
+    var fileContents = data;
     var fileType = 'xml';
   }
   await fs.writeFile(`${fileName}.${fileType}`, fileContents, 'utf-8');
